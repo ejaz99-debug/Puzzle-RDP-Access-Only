@@ -1,0 +1,60 @@
+name: Puzzle 135 - RDP Access Only
+on: workflow_dispatch
+jobs:
+  rdp:
+    runs-on: windows-latest
+    timeout-minutes: 360
+    steps:
+      - name: Start Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+
+      - name: Enable RDP + Set Password
+        run: |
+          Set-ItemProperty 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name fDenyTSConnections -Value 0 -Force
+          Set-ItemProperty 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name UserAuthentication -Value 0 -Force
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          $pass = -join ((65..90)+(97..122)+(48..57) | Get-Random -Count 20 | % {[char]$_})
+          Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString $pass -AsPlainText -Force)
+          echo "PASS=$pass" >> $env:GITHUB_ENV
+
+      - name: Create Folder + Instructions on Desktop
+        run: |
+          mkdir C:\Kangaroo
+          "Connect to this machine via RDP.
+Username: runneradmin
+Password (copy from logs): $env:PASS
+
+INSTRUCTIONS:
+1. Download Kangaroo.exe from: https://github.com/JeanLucPons/Kangaroo/releases/download/2.2/Kangaroo.exe
+   Save it to C:\Kangaroo
+2. Open Notepad, paste this and save as C:\Kangaroo\in.txt:
+
+4000000000000000000000000000000000000000000000000000000000000000
+7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+02145d2611c823a396ef6712ce0f712f09b9b4f3135e3e0aa3230fb9b6d08d1e16
+
+3. Open Command Prompt or PowerShell
+4. Type: cd C:\Kangaroo
+5. Type: Kangaroo.exe -gpu -t 8 -d 20 -w p135.save -wi 30 -ws in.txt
+6. Kangaroo will start (GPU if available, otherwise CPU)
+
+Enjoy!" | Out-File "$env:USERPROFILE\Desktop\HOW TO START KANGAROO.txt" -Encoding UTF8
+
+      - name: Show RDP Info + Keep Alive
+        run: |
+          $ip = tailscale ip -4
+          Write-Host "================================================"
+          Write-Host "RDP IS READY - CONNECT NOW!"
+          Write-Host "Tailscale IP : $ip"
+          Write-Host "Username     : runneradmin"
+          Write-Host "Password     : $env:PASS"
+          Write-Host "================================================"
+          Write-Host "Instructions file is on the desktop"
+          Write-Host "================================================"
+          Add-Type -AssemblyName System.Windows.Forms
+          while ($true) {
+            [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point((Get-Random -Maximum 1920),(Get-Random -Maximum 1080))
+            Start-Sleep -Seconds 300
+          }
