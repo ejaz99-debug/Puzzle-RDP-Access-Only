@@ -25,7 +25,7 @@ jobs:
           $text = "Connect to this machine via RDP.`n`nUsername: runneradmin`nPassword: $env:PASS (copy from GitHub logs)`n`n=== HOW TO START KANGAROO FOR PUZZLE #135 ===`n`n1. Open browser and download Kangaroo.exe from:`n   https://github.com/JeanLucPons/Kangaroo/releases/download/2.2/Kangaroo.exe`n   Save it to C:\Kangaroo`n`n2. Open Notepad, paste these 3 lines, save as C:\Kangaroo\in.txt`n`n4000000000000000000000000000000000000000000000000000000000000000`n7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff`n02145d2611c823a396ef6712ce0f712f09b9b4f3135e3e0aa3230fb9b6d08d1e16`n`n3. Press Win + R, type cmd, press Enter`n`n4. Type:`n   cd C:\Kangaroo`n   Kangaroo.exe -gpu -t 8 -d 20 -w p135.save -wi 30 -ws in.txt`n`nKangaroo will start! (GPU if available, otherwise CPU)`nProgress saves every 30 seconds.`nEnjoy your free cloud machine!`n"
           $text | Out-File "$env:USERPROFILE\Desktop\HOW TO START KANGAROO.txt" -Encoding UTF8
 
-      - name: Show RDP Info + Keep Alive
+      -      - name: Show RDP Info + Keep Alive (Cancellable)
         run: |
           $ip = tailscale ip -4
           Write-Host "================================================"
@@ -34,11 +34,19 @@ jobs:
           Write-Host "Username     : runneradmin"
           Write-Host "Password     : $env:PASS"
           Write-Host "================================================"
-          Write-Host "Open the file on desktop: HOW TO START KANGAROO.txt"
-          Write-Host "Follow the 4 easy steps inside"
+          Write-Host "Instructions on desktop - follow to start Kangaroo manually"
           Write-Host "================================================"
+
           Add-Type -AssemblyName System.Windows.Forms
+          $cancelCheck = 0
           while ($true) {
             [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point((Get-Random -Maximum 1920),(Get-Random -Maximum 1080))
-            Start-Sleep -Seconds 300
+            Start-Sleep -Seconds 30
+
+            # Optional: Check if job is cancelled (advanced, but helps)
+            $cancelCheck++
+            if ($cancelCheck -ge 10) {  # every 5 min
+              Write-Host "[Keep-alive] Still running... (cancel from GitHub if needed)"
+              $cancelCheck = 0
+            }
           }
