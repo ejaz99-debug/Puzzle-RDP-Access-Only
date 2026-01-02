@@ -22,25 +22,41 @@ jobs:
       - name: Create Folder + Instructions on Desktop
         run: |
           mkdir C:\Kangaroo
-          "Connect to this machine via RDP.
-Username: runneradmin
-Password (copy from logs): $env:PASS
 
-INSTRUCTIONS:
-1. Download Kangaroo.exe from: https://github.com/JeanLucPons/Kangaroo/releases/download/2.2/Kangaroo.exe
-   Save it to C:\Kangaroo
-2. Open Notepad, paste this and save as C:\Kangaroo\in.txt:
+          $instructions = @"
+Connect to this machine via RDP.
+
+Username: runneradmin
+Password: $env:PASS (copy it from the GitHub logs)
+
+=== HOW TO START KANGAROO FOR PUZZLE #135 ===
+
+1. Open your browser and download Kangaroo.exe from:
+   https://github.com/JeanLucPons/Kangaroo/releases/download/2.2/Kangaroo.exe
+   → Save it directly to C:\Kangaroo
+
+2. Create a file called in.txt in C:\Kangaroo:
+   Open Notepad → paste these 3 lines exactly → Save As → C:\Kangaroo\in.txt
 
 4000000000000000000000000000000000000000000000000000000000000000
 7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 02145d2611c823a396ef6712ce0f712f09b9b4f3135e3e0aa3230fb9b6d08d1e16
 
-3. Open Command Prompt or PowerShell
-4. Type: cd C:\Kangaroo
-5. Type: Kangaroo.exe -gpu -t 8 -d 20 -w p135.save -wi 30 -ws in.txt
-6. Kangaroo will start (GPU if available, otherwise CPU)
+3. Open Command Prompt (Win + R → cmd → Enter)
 
-Enjoy!" | Out-File "$env:USERPROFILE\Desktop\HOW TO START KANGAROO.txt" -Encoding UTF8
+4. Type these commands:
+   cd C:\Kangaroo
+   Kangaroo.exe -gpu -t 8 -d 20 -w p135.save -wi 30 -ws in.txt
+
+→ Kangaroo will start hunting Puzzle #135!
+   - If GPU is available → very fast
+   - If no GPU → runs on CPU (still useful)
+
+Progress saves automatically every 30 seconds.
+Enjoy your free cloud machine!
+"@
+
+          $instructions | Out-File "$env:USERPROFILE\Desktop\HOW TO START KANGAROO.txt" -Encoding UTF8
 
       - name: Show RDP Info + Keep Alive
         run: |
@@ -51,7 +67,7 @@ Enjoy!" | Out-File "$env:USERPROFILE\Desktop\HOW TO START KANGAROO.txt" -Encodin
           Write-Host "Username     : runneradmin"
           Write-Host "Password     : $env:PASS"
           Write-Host "================================================"
-          Write-Host "Instructions file is on the desktop"
+          Write-Host "A detailed instruction file is on the desktop"
           Write-Host "================================================"
           Add-Type -AssemblyName System.Windows.Forms
           while ($true) {
