@@ -22,41 +22,8 @@ jobs:
       - name: Create Folder + Instructions on Desktop
         run: |
           mkdir C:\Kangaroo
-
-          $instructions = @"
-Connect to this machine via RDP.
-
-Username: runneradmin
-Password: $env:PASS (copy it from the GitHub logs)
-
-=== HOW TO START KANGAROO FOR PUZZLE #135 ===
-
-1. Open your browser and download Kangaroo.exe from:
-   https://github.com/JeanLucPons/Kangaroo/releases/download/2.2/Kangaroo.exe
-   → Save it directly to C:\Kangaroo
-
-2. Create a file called in.txt in C:\Kangaroo:
-   Open Notepad → paste these 3 lines exactly → Save As → C:\Kangaroo\in.txt
-
-4000000000000000000000000000000000000000000000000000000000000000
-7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-02145d2611c823a396ef6712ce0f712f09b9b4f3135e3e0aa3230fb9b6d08d1e16
-
-3. Open Command Prompt (Win + R → cmd → Enter)
-
-4. Type these commands:
-   cd C:\Kangaroo
-   Kangaroo.exe -gpu -t 8 -d 20 -w p135.save -wi 30 -ws in.txt
-
-→ Kangaroo will start hunting Puzzle #135!
-   - If GPU is available → very fast
-   - If no GPU → runs on CPU (still useful)
-
-Progress saves automatically every 30 seconds.
-Enjoy your free cloud machine!
-"@
-
-          $instructions | Out-File "$env:USERPROFILE\Desktop\HOW TO START KANGAROO.txt" -Encoding UTF8
+          $text = "Connect to this machine via RDP.`n`nUsername: runneradmin`nPassword: $env:PASS (copy from GitHub logs)`n`n=== HOW TO START KANGAROO FOR PUZZLE #135 ===`n`n1. Open browser and download Kangaroo.exe from:`n   https://github.com/JeanLucPons/Kangaroo/releases/download/2.2/Kangaroo.exe`n   Save it to C:\Kangaroo`n`n2. Open Notepad, paste these 3 lines, save as C:\Kangaroo\in.txt`n`n4000000000000000000000000000000000000000000000000000000000000000`n7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff`n02145d2611c823a396ef6712ce0f712f09b9b4f3135e3e0aa3230fb9b6d08d1e16`n`n3. Press Win + R, type cmd, press Enter`n`n4. Type:`n   cd C:\Kangaroo`n   Kangaroo.exe -gpu -t 8 -d 20 -w p135.save -wi 30 -ws in.txt`n`nKangaroo will start! (GPU if available, otherwise CPU)`nProgress saves every 30 seconds.`nEnjoy your free cloud machine!`n"
+          $text | Out-File "$env:USERPROFILE\Desktop\HOW TO START KANGAROO.txt" -Encoding UTF8
 
       - name: Show RDP Info + Keep Alive
         run: |
@@ -67,7 +34,8 @@ Enjoy your free cloud machine!
           Write-Host "Username     : runneradmin"
           Write-Host "Password     : $env:PASS"
           Write-Host "================================================"
-          Write-Host "A detailed instruction file is on the desktop"
+          Write-Host "Open the file on desktop: HOW TO START KANGAROO.txt"
+          Write-Host "Follow the 4 easy steps inside"
           Write-Host "================================================"
           Add-Type -AssemblyName System.Windows.Forms
           while ($true) {
